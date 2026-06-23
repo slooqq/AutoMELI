@@ -7,6 +7,8 @@ import { TestVariant } from '../modules/ab-testing/entities/test-variant.entity'
 import { TestResult } from '../modules/ab-testing/entities/test-result.entity';
 
 export function databaseConfig(): TypeOrmModuleOptions {
+  const isProduction = process.env.NODE_ENV === 'production';
+
   return {
     type: 'better-sqlite3',
     database: process.env.DATABASE_PATH || './data/meli.db',
@@ -18,6 +20,9 @@ export function databaseConfig(): TypeOrmModuleOptions {
       TestVariant,
       TestResult,
     ],
-    synchronize: true,
+    // synchronize:true es peligroso en producción (puede borrar datos)
+    // En producción usar migraciones
+    synchronize: !isProduction,
+    logging: !isProduction,
   };
 }
