@@ -6,23 +6,38 @@ import { CompetitorSnapshot } from '../modules/tracker/entities/competitor-snaps
 import { TestVariant } from '../modules/ab-testing/entities/test-variant.entity';
 import { TestResult } from '../modules/ab-testing/entities/test-result.entity';
 
+const entities = [
+  Token,
+  Credential,
+  CompetitorItem,
+  CompetitorSnapshot,
+  TestVariant,
+  TestResult,
+];
+
 export function databaseConfig(): TypeOrmModuleOptions {
   const isProduction = process.env.NODE_ENV === 'production';
+  const databaseUrl = process.env.DATABASE_URL;
+
+  // En producción usa PostgreSQL (Railway), en local usa SQLite
+  if (isProduction && databaseUrl) {
+    return {
+      type: 'postgres',
+      url: databaseUrl,
+      entities,
+      // En producción sincronizamos automáticamente las tablas en el primer deploy.
+      // Cuando el proyecto madure, cambiar a migraciones manuales.
+      synchronize: true,
+      logging: false,
+      ssl: { rejectUnauthorized: false }, // Requerido por Railway Postgres
+    };
+  }
 
   return {
     type: 'better-sqlite3',
     database: process.env.DATABASE_PATH || './data/meli.db',
-    entities: [
-      Token,
-      Credential,
-      CompetitorItem,
-      CompetitorSnapshot,
-      TestVariant,
-      TestResult,
-    ],
-    // synchronize:true es peligroso en producción (puede borrar datos)
-    // En producción usar migraciones
-    synchronize: !isProduction,
-    logging: !isProduction,
+    entities,
+    synchronize: true,
+    logging: true,
   };
 }
