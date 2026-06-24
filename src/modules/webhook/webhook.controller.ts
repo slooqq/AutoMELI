@@ -7,6 +7,14 @@ export class WebhookController {
 
   constructor(private messagingService: MessagingService) {}
 
+  @Get('notifications')
+  verify(): { status: string; expected: string } {
+    return {
+      status: 'active',
+      expected: 'MercadoLibre sends POST notifications here',
+    };
+  }
+
   @Post('notifications')
   async handleNotification(@Body() payload: any): Promise<{ received: boolean }> {
     this.logger.log(`Webhook recibido: ${JSON.stringify(payload)}`);
