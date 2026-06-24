@@ -36,4 +36,20 @@ export class AuthController {
 
     return { message: '✅ Autenticación exitosa. Ya puedes cerrar esta ventana.' };
   }
+
+  /**
+   * Endpoint de diagnóstico temporal para ver qué variables lee el servidor.
+   * Visita: GET /auth/debug
+   */
+  @Get('debug')
+  debug() {
+    const appId = process.env.MELI_APP_ID || '';
+    return {
+      NODE_ENV: process.env.NODE_ENV || 'no-set',
+      MELI_APP_ID_EXISTS: !!appId,
+      MELI_APP_ID_LENGTH: appId.length,
+      MELI_APP_ID_PREVIEW: appId ? `${appId.slice(0, 3)}...***` : 'vacío',
+      MELI_REDIRECT_URI: process.env.MELI_REDIRECT_URI || 'no-set',
+    };
+  }
 }
