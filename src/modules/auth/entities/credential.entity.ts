@@ -11,16 +11,16 @@ export class Credential {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'text' })
+  @Column()
   appId: string;
 
-  @Column({ type: 'text' })
+  @Column()
   secretKey: string;
 
-  @Column({ type: 'text' })
+  @Column()
   redirectUri: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ nullable: true })
   userId: string;
 
   @CreateDateColumn()

@@ -11,13 +11,13 @@ export class TestVariant {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'text' })
+  @Column()
   itemId: string;
 
-  @Column({ type: 'text' })
+  @Column()
   title: string;
 
-  @Column({ type: 'text' })
+  @Column()
   imageUrl: string;
 
   @Column({ type: 'date' })

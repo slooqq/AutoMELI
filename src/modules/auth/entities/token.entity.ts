@@ -11,13 +11,13 @@ export class Token {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'text' })
+  @Column()
   accessToken: string;
 
-  @Column({ type: 'text' })
+  @Column()
   refreshToken: string;
 
-  @Column({ type: 'datetime' })
+  @Column()
   expiresAt: Date;
 
   @CreateDateColumn()

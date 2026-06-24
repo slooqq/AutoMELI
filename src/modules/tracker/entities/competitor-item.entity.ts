@@ -11,10 +11,10 @@ export class CompetitorItem {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'text', unique: true })
+  @Column({ unique: true })
   itemId: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ nullable: true })
   title: string;
 
   @Column({ type: 'boolean', default: true })
