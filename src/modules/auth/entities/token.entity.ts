@@ -14,7 +14,7 @@ export class Token {
   @Column()
   accessToken: string;
 
-  @Column()
+  @Column({ nullable: true })
   refreshToken: string;
 
   @Column()
