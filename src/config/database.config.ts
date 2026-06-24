@@ -5,6 +5,7 @@ import { CompetitorItem } from '../modules/tracker/entities/competitor-item.enti
 import { CompetitorSnapshot } from '../modules/tracker/entities/competitor-snapshot.entity';
 import { TestVariant } from '../modules/ab-testing/entities/test-variant.entity';
 import { TestResult } from '../modules/ab-testing/entities/test-result.entity';
+import { MessageTemplate } from '../modules/messaging/entities/message-template.entity';
 
 const entities = [
   Token,
@@ -13,6 +14,7 @@ const entities = [
   CompetitorSnapshot,
   TestVariant,
   TestResult,
+  MessageTemplate,
 ];
 
 export function databaseConfig(): TypeOrmModuleOptions {

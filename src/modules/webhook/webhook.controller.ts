@@ -1,10 +1,23 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Logger } from '@nestjs/common';
+import { MessagingService } from '../messaging/messaging.service';
 
 @Controller('webhook')
 export class WebhookController {
+  private readonly logger = new Logger(WebhookController.name);
+
+  constructor(private messagingService: MessagingService) {}
+
   @Post('notifications')
-  handleNotification(@Body() payload: unknown): { received: boolean } {
-    // TODO: Emit internal event for MessagingModule/TrackerModule
+  async handleNotification(@Body() payload: any): Promise<{ received: boolean }> {
+    this.logger.log(`Webhook recibido: ${JSON.stringify(payload)}`);
+
+    if (payload.topic === 'messages' && payload.resource) {
+      // MercadoLibre espera una respuesta rápida 200 OK. Procesamos asíncronamente.
+      this.messagingService.processNotification(payload.resource).catch((err) => {
+        this.logger.error(`Error procesando mensaje en background: ${err.message}`);
+      });
+    }
+
     return { received: true };
   }
 }
