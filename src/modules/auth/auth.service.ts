@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
+import * as crypto from 'crypto';
 import { Token } from './entities/token.entity';
 import { Credential } from './entities/credential.entity';
 
@@ -13,6 +14,9 @@ import { Credential } from './entities/credential.entity';
 export class AuthService {
   private readonly MELI_OAUTH_URL = 'https://auth.mercadolibre.com.ec/authorization';
   private readonly MELI_TOKEN_URL = 'https://api.mercadolibre.com/oauth/token';
+  
+  // Almacenamos el code_verifier temporalmente en memoria para el flujo de un solo usuario
+  private currentCodeVerifier: string = '';
 
   constructor(
     @InjectRepository(Token)
@@ -26,10 +30,19 @@ export class AuthService {
     const appId = this.configService.getOrThrow<string>('MELI_APP_ID');
     const redirectUri = this.configService.getOrThrow<string>('MELI_REDIRECT_URI');
 
+    // Generamos PKCE
+    this.currentCodeVerifier = crypto.randomBytes(32).toString('base64url');
+    const codeChallenge = crypto
+      .createHash('sha256')
+      .update(this.currentCodeVerifier)
+      .digest('base64url');
+
     const params = new URLSearchParams();
     params.append('client_id', appId);
     params.append('response_type', 'code');
     params.append('redirect_uri', redirectUri);
+    params.append('code_challenge', codeChallenge);
+    params.append('code_challenge_method', 'S256');
 
     return `${this.MELI_OAUTH_URL}?${params.toString()}`;
   }
@@ -39,12 +52,17 @@ export class AuthService {
     const secretKey = this.configService.getOrThrow<string>('MELI_SECRET_KEY');
     const redirectUri = this.configService.getOrThrow<string>('MELI_REDIRECT_URI');
 
+    if (!this.currentCodeVerifier) {
+      throw new InternalServerErrorException('Falta el code_verifier. Debes iniciar el flujo desde /auth/login.');
+    }
+
     const body = new URLSearchParams();
     body.append('grant_type', 'authorization_code');
     body.append('client_id', appId);
     body.append('client_secret', secretKey);
     body.append('code', code);
     body.append('redirect_uri', redirectUri);
+    body.append('code_verifier', this.currentCodeVerifier);
 
     try {
       const { data } = await axios.post<MeliTokenResponse>(
