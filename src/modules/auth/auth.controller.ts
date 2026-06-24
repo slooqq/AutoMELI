@@ -50,6 +50,7 @@ export class AuthController {
       MELI_APP_ID_LENGTH: appId.length,
       MELI_APP_ID_PREVIEW: appId ? `${appId.slice(0, 3)}...***` : 'vacío',
       MELI_REDIRECT_URI: process.env.MELI_REDIRECT_URI || 'no-set',
+      ENV_KEYS: Object.keys(process.env), // Lista todas las llaves disponibles
     };
   }
 }
