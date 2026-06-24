@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import axios from 'axios';
@@ -6,7 +6,7 @@ import { MessageTemplate } from './entities/message-template.entity';
 import { AuthService } from '../auth/auth.service';
 
 @Injectable()
-export class MessagingService {
+export class MessagingService implements OnModuleInit {
   private readonly logger = new Logger(MessagingService.name);
 
   constructor(
@@ -14,6 +14,28 @@ export class MessagingService {
     private templateRepo: Repository<MessageTemplate>,
     private authService: AuthService,
   ) {}
+
+  async onModuleInit() {
+    const count = await this.templateRepo.count();
+    if (count === 0) {
+      const defaults = [
+        { keyword: 'precio', response: 'Hola, el precio del artículo es el publicado en la publicación. No tenemos precios especiales por esta vía, todo se gestiona directamente a través de MercadoLibre. ¡Saludos!' },
+        { keyword: 'envío', response: 'Hola, el envío se realiza a través de MercadoEnvíos. El costo y tiempo de entrega se calculan automáticamente al ingresar tu código postal en la publicación. ¡Saludos!' },
+        { keyword: 'envio', response: 'Hola, el envío se realiza a través de MercadoEnvíos. El costo y tiempo de entrega se calculan automáticamente al ingresar tu código postal en la publicación. ¡Saludos!' },
+        { keyword: 'disponible', response: 'Hola, sí tenemos stock disponible del producto. Puedes realizar la compra directamente por MercadoLibre y lo procesaremos a la brevedad. ¡Saludos!' },
+        { keyword: 'stock', response: 'Hola, sí tenemos stock disponible del producto. Puedes realizar la compra directamente por MercadoLibre y lo procesaremos a la brevedad. ¡Saludos!' },
+        { keyword: 'medidas', response: 'Hola, las medidas exactas están especificadas en la publicación. Si necesitas más detalles, por favor indícanos qué información adicional requieres. ¡Saludos!' },
+        { keyword: 'garantía', response: 'Hola, el producto incluye la garantía legal de MercadoLibre. Ante cualquier inconveniente, puedes abrir un reclamo desde la plataforma. ¡Saludos!' },
+        { keyword: 'garantia', response: 'Hola, el producto incluye la garantía legal de MercadoLibre. Ante cualquier inconveniente, puedes abrir un reclamo desde la plataforma. ¡Saludos!' },
+        { keyword: 'negociable', response: 'Hola, los precios son los publicados en la plataforma. No realizamos negociaciones por fuera de MercadoLibre. Puedes revisar nuestras otras publicaciones para más opciones. ¡Saludos!' },
+        { keyword: 'horario', response: 'Hola, nuestro horario de atención es de lunes a viernes de 9:00 a 18:00. Los pedidos realizados fuera de este horario se procesan al siguiente día hábil. ¡Saludos!' },
+        { keyword: 'demora', response: 'Hola, el tiempo de preparación del pedido es de 1 a 3 días hábiles. Luego el envío depende del código postal y la agencia seleccionada. ¡Saludos!' },
+        { keyword: 'factura', response: 'Hola, emitimos factura electrónica por todas las compras realizadas a través de MercadoLibre. Puedes descargarla desde la plataforma una vez concretada la venta. ¡Saludos!' },
+      ];
+      await this.templateRepo.save(defaults);
+      this.logger.log(`${defaults.length} plantillas de auto-respuesta creadas por defecto`);
+    }
+  }
 
   async getTemplates(): Promise<MessageTemplate[]> {
     return this.templateRepo.find();
