@@ -50,7 +50,7 @@ export class MessagingService {
       if (messages.length === 0) return;
 
       // Ordenar por fecha (el más reciente primero)
-      messages.sort((a, b) => {
+      messages.sort((a: any, b: any) => {
         const dateA = a.message_date?.created || a.date_created || 0;
         const dateB = b.message_date?.created || b.date_created || 0;
         return new Date(dateB).getTime() - new Date(dateA).getTime();
