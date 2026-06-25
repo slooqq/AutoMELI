@@ -12,7 +12,7 @@ import { Credential } from './entities/credential.entity';
 
 @Injectable()
 export class AuthService {
-  private readonly MELI_OAUTH_URL = 'https://auth.mercadolibre.com.co/authorization';
+  private readonly MELI_OAUTH_URL = 'https://auth.mercadolibre.com.ec/authorization';
   private readonly MELI_TOKEN_URL = 'https://api.mercadolibre.com/oauth/token';
 
   constructor(
